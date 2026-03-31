@@ -26,6 +26,7 @@ class WppAssistantAgent:
         conversation_repo: ConversationRepository,
         *,
         extra_tools: list[Any] | None = None,
+        apps: list[str] | None = None,
         mcps: list[Any] | None = None,
         skills: list[Path] | None = None,
     ) -> Agent:
@@ -43,6 +44,7 @@ class WppAssistantAgent:
                 ),
                 *(extra_tools or []),
             ],
+            apps=apps or [],
             mcps=mcps or [],
             skills=skills or [],
             inject_date=True,
@@ -63,6 +65,11 @@ class WppAssistantAgent:
                 FetchDayMessagesTool(
                     conversation_repo=conversation_repo,
                 ),
+            ],
+            apps=[
+                "gmail/fetch_emails",
+                "gmail/get_message",
+                "gmail/fetch_thread",
             ],
             mcps=[
                 MCPServerHTTP(
