@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import time
 
 from arize.otel import register
 from crewai.flow import Flow, listen, or_, router, start
@@ -8,7 +9,7 @@ from openinference.instrumentation.openai import OpenAIInstrumentor
 
 from wpp_assistant.crews import ReplyUnauthorizedUserCrew, ReplyUserCrew
 from wpp_assistant.repositories import ConversationRepository
-from wpp_assistant.types import Conversation, WppAssistantState
+from wpp_assistant.types import Conversation, RunType, WppAssistantState
 from wpp_assistant.utils import is_authorized_user
 
 tracer_provider = register(
@@ -30,6 +31,18 @@ class WppAssistantFlow(Flow[WppAssistantState]):
         self.repo = ConversationRepository()
 
     @start()
+    def initialize(self):
+        return "Flow initialized"
+
+    @router(initialize)
+    def route_run_type(self):
+        return self.state.run_type.value
+
+    @listen(RunType.RESET_MEMORY.value)
+    def reset_memory(self):
+        self.repo.reset()
+
+    @listen(RunType.DEFAULT.value)
     def load_messages(self):
         phone_number = self.state.messages[-1].from_
         self.conversation = self.repo.resolve_conversation(phone_number)
@@ -54,24 +67,27 @@ class WppAssistantFlow(Flow[WppAssistantState]):
             conversation_repo=self.repo,
         ).crew().kickoff(inputs={"conversation": self.conversation.model_dump()})
 
-    @listen(or_(reply_whitelisted_user, check_whitelisted_numbers))
+    @listen(or_(reset_memory, reply_whitelisted_user, check_whitelisted_numbers))
     def consolidate_output(self):
-        return {"conversation_id": self.conversation.id}
+        return self.state.model_dump()
 
 
 def kickoff():
     WppAssistantFlow().kickoff(
+        # OPTION 1: Sending a message to the assistant
         inputs={
             "messages": [
                 {
                     "from": "558196448480",
                     "id": "wamid.test123",
-                    "timestamp": "1774453258",
+                    "timestamp": str(int(time.time())),
                     "type": "text",
-                    "text": {"body": "Olá!"},
+                    "text": {"body": "como vc se chama?"},
                 }
-            ],
+            ]
         }
+        # OPTION 2: Resetting the memory
+        # inputs={"run_type": RunType.RESET_MEMORY.value}
     )
 
 

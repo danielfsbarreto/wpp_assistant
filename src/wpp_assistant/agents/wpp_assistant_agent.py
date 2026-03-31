@@ -8,7 +8,7 @@ from crewai.mcp import MCPServerHTTP
 from crewai_tools import SerperDevTool, SerperScrapeWebsiteTool
 
 from wpp_assistant.repositories import ConversationRepository
-from wpp_assistant.tools import SendTextMessageTool
+from wpp_assistant.tools import FetchDayMessagesTool, SendTextMessageTool
 from wpp_assistant.types import Conversation
 
 SKILLS_DIR = Path(__file__).parent.parent / "skills"
@@ -52,7 +52,13 @@ class WppAssistantAgent:
         return cls.__create(
             conversation,
             conversation_repo,
-            extra_tools=[SerperDevTool(), SerperScrapeWebsiteTool()],
+            extra_tools=[
+                SerperDevTool(),
+                SerperScrapeWebsiteTool(),
+                FetchDayMessagesTool(
+                    conversation_repo=conversation_repo,
+                ),
+            ],
             mcps=[
                 MCPServerHTTP(
                     url="https://ai.todoist.net/mcp",

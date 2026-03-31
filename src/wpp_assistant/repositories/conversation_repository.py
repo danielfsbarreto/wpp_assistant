@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import sqlite3
@@ -10,7 +11,6 @@ from wpp_assistant.types.whatsapp_message import AnyWhatsappMessage, _resolve_me
 
 
 class ConversationRepository:
-    CONVERSATION_GAP_HOURS = 48
 
     def __init__(self, db_path: str | None = None):
         path = db_path or os.getenv(
@@ -59,22 +59,30 @@ class ConversationRepository:
                 """
             )
 
+    def reset(self) -> None:
+        with sqlite3.connect(self.db_path, timeout=30) as conn:
+            conn.execute("DELETE FROM messages")
+            conn.execute("DELETE FROM conversations")
+
     def resolve_conversation(self, phone_number: str) -> Conversation:
         now = int(time.time())
-        gap_seconds = self.CONVERSATION_GAP_HOURS * 3600
+        today = datetime.date.today()
+        day_start = int(datetime.datetime.combine(today, datetime.time.min).timestamp())
+        day_end = int(datetime.datetime.combine(today, datetime.time.max).timestamp())
 
         with sqlite3.connect(self.db_path, timeout=30) as conn:
             row = conn.execute(
                 """
-                SELECT id, last_message_at FROM conversations
+                SELECT id FROM conversations
                 WHERE phone_number = ?
-                ORDER BY last_message_at DESC
+                  AND created_at >= ?
+                  AND created_at <= ?
                 LIMIT 1
                 """,
-                (phone_number,),
+                (phone_number, day_start, day_end),
             ).fetchone()
 
-            if row and (now - row[1]) < gap_seconds:
+            if row:
                 return self.get_conversation(row[0])
 
             conversation_id = str(uuid4())
@@ -128,6 +136,34 @@ class ConversationRepository:
                 """,
                 (max_ts, conversation_id),
             )
+
+    def get_messages_by_date(
+        self, phone_number: str, date: str
+    ) -> list[AnyWhatsappMessage]:
+        target = datetime.date.fromisoformat(date)
+        day_start = int(
+            datetime.datetime.combine(target, datetime.time.min).timestamp()
+        )
+        day_end = int(
+            datetime.datetime.combine(target, datetime.time.max).timestamp()
+        )
+
+        with sqlite3.connect(self.db_path, timeout=30) as conn:
+            row = conn.execute(
+                """
+                SELECT id FROM conversations
+                WHERE phone_number = ?
+                  AND created_at >= ?
+                  AND created_at <= ?
+                LIMIT 1
+                """,
+                (phone_number, day_start, day_end),
+            ).fetchone()
+
+            if not row:
+                return []
+
+        return self.get_conversation(row[0]).messages
 
     def get_conversation(self, conversation_id: str) -> Conversation:
         with sqlite3.connect(self.db_path, timeout=30) as conn:

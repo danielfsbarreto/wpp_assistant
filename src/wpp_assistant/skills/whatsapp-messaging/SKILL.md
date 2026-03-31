@@ -4,7 +4,7 @@ description: >
   WhatsApp conversation rules and messaging guidelines. This skill defines how
   to compose and deliver messages through WhatsApp, including tone, formatting,
   and delivery via the SendTextMessageTool.
-allowed-tools: SendTextMessageTool
+allowed-tools: SendTextMessageTool, FetchDayMessagesTool
 metadata:
   author: wpp-assistant
   version: "1.0"
@@ -43,6 +43,13 @@ them.
 - Plain text only, no markdown. Write for WhatsApp, not email.
 - Keep messages concise but complete. Break long answers into multiple short
   messages if needed.
+
+## Retrieving Past Conversations
+
+Conversations are stored per calendar day. You only see today's messages in the
+prompt. If the user references something from a previous day, use
+**FetchDayMessagesTool** to retrieve that day's messages. Provide the user's
+phone number and the target date in YYYY-MM-DD format.
 
 ## Conversation Flow
 

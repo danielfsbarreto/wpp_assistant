@@ -36,7 +36,7 @@ class SendTextMessageTool(BaseTool):
 
     def _run(self, to: PhoneNumber, content: str) -> dict:
         message = TextMessage(
-            from_=to,
+            from_=os.getenv("WHATSAPP_BOT_PHONE_NUMBER"),
             timestamp=str(int(time.time())),
             type="text",
             text=TextBody(body=content),
