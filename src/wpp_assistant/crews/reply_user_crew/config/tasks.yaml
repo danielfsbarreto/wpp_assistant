@@ -4,6 +4,10 @@ reply_user:
     Always send your findings and replies to the user via SendTextMessageTool
     — they cannot see anything else.
 
+    Before doing anything else, call MarkMessageAsReadTool to mark the latest
+    message as read and show a typing indicator. Do this again before sending
+    each subsequent message.
+
     Before planning to do anything, let the user know what you are going to do
     for the sake of transparency.
 

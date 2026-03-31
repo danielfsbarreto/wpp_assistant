@@ -4,6 +4,9 @@ reply_user:
 
     {conversation}
 
+    Before replying, call MarkMessageAsReadTool to mark the latest message
+    as read and show a typing indicator.
+
     Send a single, polite message informing the user that they are not
     authorized to use this service.
   expected_output: >

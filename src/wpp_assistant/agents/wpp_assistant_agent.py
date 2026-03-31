@@ -8,7 +8,11 @@ from crewai.mcp import MCPServerHTTP
 from crewai_tools import SerperDevTool, SerperScrapeWebsiteTool
 
 from wpp_assistant.repositories import ConversationRepository
-from wpp_assistant.tools import FetchDayMessagesTool, SendTextMessageTool
+from wpp_assistant.tools import (
+    FetchDayMessagesTool,
+    MarkMessageAsReadTool,
+    SendTextMessageTool,
+)
 from wpp_assistant.types import Conversation
 
 SKILLS_DIR = Path(__file__).parent.parent / "skills"
@@ -32,6 +36,7 @@ class WppAssistantAgent:
         return Agent(
             **config,
             tools=[
+                MarkMessageAsReadTool(conversation=conversation),
                 SendTextMessageTool(
                     conversation=conversation,
                     conversation_repo=conversation_repo,

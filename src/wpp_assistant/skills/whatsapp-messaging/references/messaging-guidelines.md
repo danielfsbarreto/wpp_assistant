@@ -1,5 +1,13 @@
 # WhatsApp Messaging — Detailed Guidelines
 
+## Read Receipts and Typing Indicators
+
+- **First thing**: call MarkMessageAsReadTool before you do anything else. This
+  marks the latest message as read and shows the user a typing indicator so they
+  know you're working on it.
+- **Before each reply**: call MarkMessageAsReadTool again before sending each
+  subsequent message to re-activate the typing indicator.
+
 ## When to Send Messages
 
 - **Before long operations**: if you're about to search, scrape, or perform a
