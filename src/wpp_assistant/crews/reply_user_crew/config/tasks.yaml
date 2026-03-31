@@ -4,6 +4,12 @@ reply_user:
     Always send your findings and replies to the user via SendTextMessageTool
     — they cannot see anything else.
 
+    Before planning to do anything, let the user know what you are going to do
+    for the sake of transparency.
+
+    Also, after you finish you task, send a final message contextualizing them
+    on what has been done in a natural way.
+
     CONVERSATION HISTORY:
     {conversation}
   expected_output: >

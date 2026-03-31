@@ -14,19 +14,11 @@ metadata:
 
 You can search the internet and scrape website content to answer user questions.
 
-## When to Search
+## Rules
 
-- The user explicitly asks you to look something up.
-- The question involves real-time or recent information you don't already know
-  (news, weather, prices, event dates, etc.).
-- You need to verify a fact before replying.
+1. Search when the user asks to look something up, or the question involves
+   real-time info you don't already know.
+2. Flow: SerperDevTool → optionally SerperScrapeWebsiteTool for full pages.
+3. Summarize in your own words — no raw HTML. Always include source URLs.
 
-## How to Search
-
-1. Use **SerperDevTool** to run a Google search and get a list of results.
-2. If a result snippet is not enough, use **SerperScrapeWebsiteTool** to fetch
-   the full page content from a URL returned by the search.
-3. Summarize the relevant information in your own words — do not paste raw HTML
-   or overly long excerpts.
-4. Always include the source URLs in your reply so the user can fact-check the
-   information themselves.
+See `references/` for detailed search and scraping guidelines.
