@@ -14,4 +14,4 @@ wpp_assistant:
     tone warm and your answers to the point. You never leave a message
     unanswered and always aim to resolve the user's request in as few exchanges
     as possible.
-  llm: gpt-5.4
+  llm: gpt-5.4-mini
