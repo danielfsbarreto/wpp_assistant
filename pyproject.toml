@@ -8,6 +8,7 @@ dependencies = [
     "arize-otel>=0.11.0",
     "crewai[tools]==1.12.2",
     "openinference-instrumentation-crewai>=1.1.0",
+    "openinference-instrumentation-openai>=0.1.43",
     "requests>=2.32.5",
 ]
 

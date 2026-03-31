@@ -1943,6 +1943,24 @@ wheels = [
 ]
 
 [[package]]
+name = "openinference-instrumentation-openai"
+version = "0.1.43"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "openinference-instrumentation" },
+    { name = "openinference-semantic-conventions" },
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-instrumentation" },
+    { name = "opentelemetry-semantic-conventions" },
+    { name = "typing-extensions" },
+    { name = "wrapt" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e8/41/9c524841fc2823ec15a58a4e2c6cdbda500cef1d8a3c447060388acfa8dd/openinference_instrumentation_openai-0.1.43.tar.gz", hash = "sha256:66ceb5459d5d7eb76f91e679c8993df5f2e09fcb1f8ff7e6465a1402f9201ac6", size = 23345, upload-time = "2026-03-24T18:23:24.307Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/63/91/b3528285e2d345d4abfd23386b316445bc0db061c8f941b142dd484d2f16/openinference_instrumentation_openai-0.1.43-py3-none-any.whl", hash = "sha256:9b8e5f69f811386cb116a8064069364d50f78b6528561494f145a334fff3df7c", size = 30862, upload-time = "2026-03-24T18:23:23.42Z" },
+]
+
+[[package]]
 name = "openinference-semantic-conventions"
 version = "0.1.28"
 source = { registry = "https://pypi.org/simple" }
@@ -3633,6 +3651,7 @@ dependencies = [
     { name = "arize-otel" },
     { name = "crewai", extra = ["tools"] },
     { name = "openinference-instrumentation-crewai" },
+    { name = "openinference-instrumentation-openai" },
     { name = "requests" },
 ]
 
@@ -3641,6 +3660,7 @@ requires-dist = [
     { name = "arize-otel", specifier = ">=0.11.0" },
     { name = "crewai", extras = ["tools"], specifier = "==1.12.2" },
     { name = "openinference-instrumentation-crewai", specifier = ">=1.1.0" },
+    { name = "openinference-instrumentation-openai", specifier = ">=0.1.43" },
     { name = "requests", specifier = ">=2.32.5" },
 ]
 

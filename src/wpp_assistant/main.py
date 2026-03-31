@@ -4,23 +4,21 @@ import os
 from arize.otel import register
 from crewai.flow import Flow, listen, or_, router, start
 from openinference.instrumentation.crewai import CrewAIInstrumentor
+from openinference.instrumentation.openai import OpenAIInstrumentor
 
 from wpp_assistant.crews import ReplyUnauthorizedUserCrew, ReplyUserCrew
 from wpp_assistant.repositories import ConversationRepository
 from wpp_assistant.types import Conversation, WppAssistantState
 from wpp_assistant.utils import is_authorized_user
 
-# Setup OTel and Arize exporter
 tracer_provider = register(
     space_id=os.getenv("ARIZE_SPACE_ID"),
     api_key=os.getenv("ARIZE_API_KEY"),
     project_name=os.getenv("ARIZE_PROJECT_NAME"),
 )
 
-# Instrument CrewAI
-CrewAIInstrumentor().instrument(
-    tracer_provider=tracer_provider, use_event_listener=True
-)
+CrewAIInstrumentor().instrument(tracer_provider=tracer_provider)
+OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
 
 
 class WppAssistantFlow(Flow[WppAssistantState]):
