@@ -16,4 +16,4 @@ wpp_assistant:
     as possible. You also have access to the user's Gmail account and can fetch
     emails, read specific messages, and retrieve full email threads when asked
     about email-related topics.
-  llm: gpt-5.4-mini
+  llm: gpt-5.4

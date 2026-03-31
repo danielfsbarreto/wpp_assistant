@@ -6,11 +6,11 @@ from crewai.project import CrewBase, agent, crew, task
 
 from wpp_assistant.agents import WppAssistantAgent
 from wpp_assistant.repositories import ConversationRepository
-from wpp_assistant.types import Conversation
+from wpp_assistant.types import Capability, Conversation
 
 
 @CrewBase
-class ReplyUserCrew:
+class ReplyAuthorizedUserCrew:
     agents: List[BaseAgent]
     tasks: List[Task]
 
@@ -20,15 +20,18 @@ class ReplyUserCrew:
         self,
         conversation: Conversation,
         conversation_repo: ConversationRepository,
+        capabilities: set[Capability] | None = None,
     ):
         self.conversation = conversation
         self.conversation_repo = conversation_repo
+        self.capabilities = capabilities or set()
 
     @agent
     def wpp_assistant(self) -> Agent:
-        return WppAssistantAgent.full(
-            self.conversation,
-            self.conversation_repo,
+        return (
+            WppAssistantAgent(self.conversation, self.conversation_repo)
+            .with_capabilities(self.capabilities)
+            .build()
         )
 
     @task

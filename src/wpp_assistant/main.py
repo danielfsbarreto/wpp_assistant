@@ -7,9 +7,10 @@ from crewai.flow import Flow, listen, or_, router, start
 from openinference.instrumentation.crewai import CrewAIInstrumentor
 from openinference.instrumentation.openai import OpenAIInstrumentor
 
-from wpp_assistant.crews import ReplyUnauthorizedUserCrew, ReplyUserCrew
+from wpp_assistant.agents.classifier_agent import ClassifierAgent
+from wpp_assistant.crews import ReplyAuthorizedUserCrew, ReplyUnauthorizedUserCrew
 from wpp_assistant.repositories import ConversationRepository
-from wpp_assistant.types import Conversation, RunType, WppAssistantState
+from wpp_assistant.types import Capability, Conversation, RunType, WppAssistantState
 from wpp_assistant.utils import is_authorized_user
 
 tracer_provider = register(
@@ -23,12 +24,9 @@ OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
 
 
 class WppAssistantFlow(Flow[WppAssistantState]):
-    repo: ConversationRepository = None
+    repo: ConversationRepository = ConversationRepository()
     conversation: Conversation = None
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.repo = ConversationRepository()
+    required_capabilities: set[Capability] = set()
 
     @start()
     def initialize(self):
@@ -61,10 +59,15 @@ class WppAssistantFlow(Flow[WppAssistantState]):
         return "AUTHORIZED"
 
     @listen("AUTHORIZED")
+    def classify_capabilities(self):
+        self.required_capabilities = ClassifierAgent().classify(self.conversation)
+
+    @listen(classify_capabilities)
     def reply_whitelisted_user(self):
-        ReplyUserCrew(
+        ReplyAuthorizedUserCrew(
             conversation=self.conversation,
             conversation_repo=self.repo,
+            capabilities=self.required_capabilities,
         ).crew().kickoff(inputs={"conversation": self.conversation.model_dump()})
 
     @listen(or_(reset_memory, reply_whitelisted_user, check_whitelisted_numbers))
@@ -82,7 +85,7 @@ def kickoff():
                     "id": "wamid.test123",
                     "timestamp": str(int(time.time())),
                     "type": "text",
-                    "text": {"body": "como vc se chama?"},
+                    "text": {"body": "Oi, tudo bem?"},
                 }
             ]
         }

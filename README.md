@@ -43,7 +43,7 @@ Incoming message
          AUTHORIZED          UNAUTHORIZED
               │                   │
               ▼                   ▼
-     ReplyUserCrew      ReplyUnauthorizedUserCrew
+     ReplyAuthorizedUserCrew  ReplyUnauthorizedUserCrew
               │                   │
               └─────────┬─────────┘
                         ▼
@@ -52,7 +52,7 @@ Incoming message
 
 1. **load_messages** — appends incoming messages to the persisted conversation.
 2. **check_whitelisted_numbers** — routes based on whether the sender is in `AUTHORIZED_NUMBERS`.
-3. **ReplyUserCrew** — full agent with web search, Todoist, and scraping tools. Replies conversationally.
+3. **ReplyAuthorizedUserCrew** — full agent with web search, Todoist, and scraping tools. Replies conversationally.
 4. **ReplyUnauthorizedUserCrew** — minimal agent that politely declines.
 5. **consolidate_output** — returns the updated conversation state.
 
@@ -67,7 +67,7 @@ src/wpp_assistant/
 │   ├── wpp_assistant_agent.py
 │   └── config/agents.yaml
 ├── crews/                         # Crew definitions
-│   ├── reply_user_crew/
+│   ├── reply_authorized_user_crew/
 │   └── reply_unauthorized_user_crew/
 ├── tools/                         # Custom tools
 │   └── send_text_message_tool.py

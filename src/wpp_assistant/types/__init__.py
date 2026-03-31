@@ -1,3 +1,5 @@
+from .capability import Capability
+from .classify_response import ClassifyResponse
 from .conversation import Conversation
 from .phone_number import PhoneNumber
 from .run_type import RunType
@@ -8,6 +10,8 @@ from .wpp_assistant_state import WppAssistantState
 
 __all__ = [
     "AnyWhatsappMessage",
+    "Capability",
+    "ClassifyResponse",
     "Conversation",
     "PhoneNumber",
     "RunType",

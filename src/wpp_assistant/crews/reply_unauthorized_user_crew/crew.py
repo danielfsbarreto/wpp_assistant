@@ -26,10 +26,10 @@ class ReplyUnauthorizedUserCrew:
 
     @agent
     def wpp_assistant(self) -> Agent:
-        return WppAssistantAgent.minimal(
+        return WppAssistantAgent(
             self.conversation,
             self.conversation_repo,
-        )
+        ).build()
 
     @task
     def reply_user(self) -> Task:

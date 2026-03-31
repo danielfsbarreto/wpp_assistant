@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 from pathlib import Path
 from typing import Any
@@ -13,83 +15,95 @@ from wpp_assistant.tools import (
     MarkMessageAsReadTool,
     SendTextMessageTool,
 )
-from wpp_assistant.types import Conversation
+from wpp_assistant.types import Capability, Conversation
 
 SKILLS_DIR = Path(__file__).parent.parent / "skills"
 
 
 class WppAssistantAgent:
-    @classmethod
-    def __create(
-        cls,
+    def __init__(
+        self,
         conversation: Conversation,
         conversation_repo: ConversationRepository,
-        *,
-        extra_tools: list[Any] | None = None,
-        apps: list[str] | None = None,
-        mcps: list[Any] | None = None,
-        skills: list[Path] | None = None,
-    ) -> Agent:
+    ) -> None:
+        self._conversation = conversation
+        self._conversation_repo = conversation_repo
+
         config_path = Path(__file__).parent / "config" / "agents.yaml"
         with open(config_path) as f:
-            config = yaml.safe_load(f)["wpp_assistant"]
+            self._config = yaml.safe_load(f)["wpp_assistant"]
 
-        return Agent(
-            **config,
-            tools=[
-                MarkMessageAsReadTool(conversation=conversation),
-                SendTextMessageTool(
-                    conversation=conversation,
-                    conversation_repo=conversation_repo,
-                ),
-                *(extra_tools or []),
-            ],
-            apps=apps or [],
-            mcps=mcps or [],
-            skills=skills or [],
-            inject_date=True,
-        )
+        self._tools: list[Any] = [
+            MarkMessageAsReadTool(conversation=conversation),
+            SendTextMessageTool(
+                conversation=conversation,
+                conversation_repo=conversation_repo,
+            ),
+        ]
+        self._apps: list[str] = []
+        self._mcps: list[Any] = []
+        self._skills: list[Path] = [SKILLS_DIR / "whatsapp-messaging"]
 
-    @classmethod
-    def full(
-        cls,
-        conversation: Conversation,
-        conversation_repo: ConversationRepository,
-    ) -> Agent:
-        return cls.__create(
-            conversation,
-            conversation_repo,
-            extra_tools=[
+    def with_web_search_support(self) -> WppAssistantAgent:
+        self._tools.extend(
+            [
                 SerperDevTool(),
                 SerperScrapeWebsiteTool(),
-                FetchDayMessagesTool(
-                    conversation_repo=conversation_repo,
-                ),
-            ],
-            apps=[
+            ]
+        )
+        self._skills.extend([SKILLS_DIR / "web-search"])
+        return self
+
+    def with_history_support(self) -> WppAssistantAgent:
+        self._tools.extend(
+            [
+                FetchDayMessagesTool(conversation_repo=self._conversation_repo),
+            ]
+        )
+        return self
+
+    def with_gmail_support(self) -> WppAssistantAgent:
+        self._apps.extend(
+            [
                 "gmail/fetch_emails",
                 "gmail/get_message",
                 "gmail/fetch_thread",
-            ],
-            mcps=[
+            ]
+        )
+        self._skills.extend([SKILLS_DIR / "gmail"])
+        return self
+
+    def with_todoist_support(self) -> WppAssistantAgent:
+        self._mcps.extend(
+            [
                 MCPServerHTTP(
                     url="https://ai.todoist.net/mcp",
                     headers={
                         "Authorization": f"Bearer {os.getenv('TODOIST_API_KEY')}",
                     },
                 )
-            ],
-            skills=[SKILLS_DIR],
+            ]
         )
+        self._skills.extend([SKILLS_DIR / "todoist"])
+        return self
 
-    @classmethod
-    def minimal(
-        cls,
-        conversation: Conversation,
-        conversation_repo: ConversationRepository,
-    ) -> Agent:
-        return cls.__create(
-            conversation,
-            conversation_repo,
-            skills=[SKILLS_DIR / "whatsapp-messaging"],
+    def with_capabilities(self, capabilities: set[Capability]) -> WppAssistantAgent:
+        capability_map = {
+            Capability.WEB_SEARCH: self.with_web_search_support,
+            Capability.HISTORY: self.with_history_support,
+            Capability.GMAIL: self.with_gmail_support,
+            Capability.TODOIST: self.with_todoist_support,
+        }
+        for cap in capabilities:
+            capability_map[cap]()
+        return self
+
+    def build(self) -> Agent:
+        return Agent(
+            **self._config,
+            tools=self._tools,
+            apps=self._apps,
+            mcps=self._mcps,
+            skills=self._skills,
+            inject_date=True,
         )
