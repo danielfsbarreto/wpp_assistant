@@ -1,0 +1,13 @@
+reply_user:
+  description: >
+    You have received a WhatsApp conversation from an unauthorized user.
+
+    {conversation}
+
+    Send a single, polite message informing the user that they are not
+    authorized to use this service.
+  expected_output: >
+    A single plain-text WhatsApp message, in the same language as the
+    conversation, informing the user they are not authorized. Delivered
+    via SendTextMessageTool.
+  agent: wpp_assistant

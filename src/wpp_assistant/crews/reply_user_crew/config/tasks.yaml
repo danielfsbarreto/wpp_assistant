@@ -1,0 +1,11 @@
+reply_user:
+  description: >
+    Continue this WhatsApp conversation naturally.
+    Always send your findings and replies to the user via SendTextMessageTool
+    — they cannot see anything else.
+
+    CONVERSATION HISTORY:
+    {conversation}
+  expected_output: >
+    All replies delivered via SendTextMessageTool. Plain text, no markdown.
+  agent: wpp_assistant

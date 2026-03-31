@@ -1,0 +1,25 @@
+[project]
+name = "wpp_assistant"
+version = "0.1.0"
+description = "wpp_assistant using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "arize-otel>=0.11.0",
+    "crewai[tools]==1.12.2",
+    "openinference-instrumentation-crewai>=1.1.0",
+    "requests>=2.32.5",
+]
+
+[project.scripts]
+kickoff = "wpp_assistant.main:kickoff"
+run_crew = "wpp_assistant.main:kickoff"
+plot = "wpp_assistant.main:plot"
+run_with_trigger = "wpp_assistant.main:run_with_trigger"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "flow"
