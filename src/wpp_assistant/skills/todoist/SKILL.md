@@ -17,8 +17,9 @@ Use it to query, create, update, and complete tasks on behalf of the user.
 ## Rules
 
 1. Never filter by assignee — no tasks are assigned to anyone.
-2. "My tasks" or "tasks to do" = unassigned tasks across all projects.
-3. Shared/household tasks = the "Casa" project (the only shared project).
-4. All other projects are personal.
+2. Never set `startDate` on tasks — only use `dueString` for dates.
+3. "My tasks" or "tasks to do" = unassigned tasks across all projects.
+4. Shared/household tasks = the "Casa" project (the only shared project).
+5. All other projects are personal.
 
 See `references/` for detailed querying patterns and project conventions.
